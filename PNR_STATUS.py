@@ -15,7 +15,7 @@ def setToken():
 
     if len(ph_no) < 10 or len(ph_no) > 10: # phone no input validation
         print("the phone no is incorrect")
-        exit()
+        sys.exit()
 
     const.RANDOM_UUID = str(uuid4())
     otpDict = {
@@ -42,7 +42,7 @@ def setToken():
 
     if "Bad Request" in otp_response: # validating response
         print("Bad Request Error")
-        exit()
+        sys.exit()
     else:
         otp_uuid = otp_response['renderTemplate']['data']['Details']
     tokenDict = {
@@ -58,7 +58,7 @@ def setToken():
     otp = str(input("enter otp: "))
     if len(otp) > 6 or len(otp) < 6:
         print("the otp is wrong")
-        exit()
+        sys.exit()
     tokenDict['cxpayload']['otpuuid'] = otp_uuid
     tokenDict['userToken'] = const.RANDOM_UUID
     tokenDict['cxpayload']['otp'] = otp
@@ -74,7 +74,7 @@ def setToken():
     
     if "cxtoken" not in token_json:
         print("the otp is wrong")
-        exit()
+        sys.exit()
 
     token = token_json['cxtoken']
 
@@ -115,7 +115,7 @@ def pnr_input():
         pnr = str(input("Enter PNR Number: "))
     if len(pnr) > 10 or len(pnr) < 10:
         print("the pnr is wrong")
-        exit()
+        sys.exit()
     else:
         return pnr
 
@@ -145,7 +145,7 @@ def print_pnr(token,uuid,pnr):
     
     if str(pnrDict['renderTemplate']['data']['departureTime']) == '0': # check if pnr is generated or not
         print("PNR NOT YET GENERATED OR FLUSHED")
-        exit()
+        sys.exit()
     else:
         data = pnrDict['renderTemplate']['data']
         passenger = pnrDict['renderTemplate']['data']['passengerList']
@@ -204,19 +204,19 @@ if len(argv) == 1:
 else:
     if len(argv) > 2:
         print("Too Many Arguments" + '\n' + f"Correct Usage python {os.path.basename(__file__)} " + "<10 digit PNR>" + " or --reset")
-        exit()
+        sys.exit()
     elif argv[1] == "--reset":
         choice = str(input("Do you really want to Reset your session Y for yes and N for no: "))
         if choice == 'Y':
             os.remove(file_path)
             print("Cleared Session")
-            exit()
+            sys.exit()
         elif choice == 'N':
             print("Didn't Clear Session")
-            exit()
+            sys.exit()
     elif len(argv[1]) != 10:
         print("The PNR is Not 10 digits long" + '\n' + f"Correct Usage python {os.path.basename(__file__)} " + "<10 digit PNR>" + " or --reset" )
-        exit()
+        sys.exit()
     elif len(argv[1]) == 10:
         begin = time.time()
         print_pnr(token,uuid,argv[1])
