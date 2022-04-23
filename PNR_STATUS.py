@@ -70,7 +70,7 @@ def setToken():
     token_json = loads(token_req_res.content.decode())
 
     print("setting token")
-    sleep(0.5)
+    time.sleep(0.5)
     
     if "cxtoken" not in token_json:
         print("the otp is wrong")
