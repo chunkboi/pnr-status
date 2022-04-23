@@ -220,6 +220,3 @@ else:
         print_pnr(token,uuid,argv[1])
         end = time.time()
         print(f"total runtime was {end - begin} seconds")
-
-
-
