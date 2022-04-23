@@ -96,8 +96,8 @@ def getPNRStatus(token, uuid,pnr):
     "isFallback":False,
     "isRefund":False
     }
-    pnrDict['query'] = pnr
-    pnrDict['cxpayload']['pnr'] = pnr
+    pnrDict['query'] = str(pnr)
+    pnrDict['cxpayload']['pnr'] = str(pnr)
     pnrDict['userToken'] = uuid
 
     headerDict = {'Accept': 'application/json, text/plain, */*', 'cxtoken':'bruh'}
@@ -155,7 +155,11 @@ def print_pnr(token,uuid,pnr):
         if int(data['numberOfpassenger']) == 1: # checking number of passenger
             if int(data['passengerList']['currentBerthNo']) == 0: # for WL and RAC tickets the currentBerthNo value will be the current status of the ticket so here we check if the ticket is WL/RAC or not if the value is 0 then the ticket was confirmed from the beginning
                 #print Coach and Seat No
-                print("Passenger " +  data['passengerList']['passengerSerialNumber'] + ': ' + data['passengerList']['bookingStatus'] + '/'  + data['passengerList']['bookingCoachId'] +'/' + data['passengerList']['bookingBerthNo'] + "/" + data['passengerList']['bookingBerthCode'] +' ' + "Age: " + data['passengerList']['passengerAge'])
+                if 'bookingBerthCode' in passenger:
+                    print("Passenger " +  data['passengerList']['passengerSerialNumber'] + ': ' + data['passengerList']['bookingStatus'] + '/'  + data['passengerList']['bookingCoachId'] +'/' + data['passengerList']['bookingBerthNo'] + "/" + data['passengerList']['bookingBerthCode'] +' ' + "Age: " + data['passengerList']['passengerAge'])
+                else:
+                    print("Passenger " +  data['passengerList']['passengerSerialNumber'] + ': ' + data['passengerList']['bookingStatus'] + '/'  + data['passengerList']['bookingCoachId'] +'/' + data['passengerList']['bookingBerthNo'] +' ' + "Age: " + data['passengerList']['passengerAge'])
+
             else:
                 #print the WL/RAC position
                 if 'currentBerthCode' in passenger:
@@ -167,7 +171,12 @@ def print_pnr(token,uuid,pnr):
             passenger_multiple = data['passengerList'][0]
             if data['passengerList'][0]['currentBerthNo'] == '0': #the currentBerthNo is in the passengerList so we need the list index to check for WL/RAC
                 for i in range(int(data['numberOfpassenger'])):#looping through the number of passengers to print all the passenger data for multiple passengers
-                    print("Passenger " +  data['passengerList'][i]['passengerSerialNumber'] + ': ' + data['passengerList'][i]['bookingStatus'] + '/'  + data['passengerList'][i]['bookingCoachId'] +'/' + data['passengerList'][i]['bookingBerthNo'] +'/' + data['passengerList'][i]['bookingBerthCode'] +" " + "Age: " + data['passengerList'][i]['passengerAge'])                
+                    if 'bookingBerthCode' in passenger_multiple:
+                        print("Passenger " +  data['passengerList'][i]['passengerSerialNumber'] + ': ' + data['passengerList'][i]['bookingStatus'] + '/'  + data['passengerList'][i]['bookingCoachId'] +'/' + data['passengerList'][i]['bookingBerthNo'] +'/' + data['passengerList'][i]['bookingBerthCode'] +" " + "Age: " + data['passengerList'][i]['passengerAge'])                
+                    else:
+                        print("Passenger " +  data['passengerList'][i]['passengerSerialNumber'] + ': ' + data['passengerList'][i]['bookingStatus'] + '/'  + data['passengerList'][i]['bookingCoachId'] +'/' + data['passengerList'][i]['bookingBerthNo'] +" " + "Age: " + data['passengerList'][i]['passengerAge'])
+
+
             else:
                 for i in range(int(data['numberOfpassenger'])):  #looping for printing WL/RAC position
                     if 'currentBerthCode' in passenger_multiple:
