@@ -5,7 +5,7 @@ from pathlib import Path
 import os
 from pconst import const
 import time
-from sys import exit,argv
+from sys import argv
 
 file_path = Path(r"session.txt") # setting the path for the token and uuid
 
@@ -148,7 +148,7 @@ def print_pnr(token,uuid,pnr):
     else:
         data = pnrDict['renderTemplate']['data']
         passenger = pnrDict['renderTemplate']['data']['passengerList']
-        os.system('cls' if os.name == 'nt' else 'clear')
+        #os.system('cls' if os.name == 'nt' else 'clear')
 
         print("Train Details: " + data['trainNumber'] + ' - ' + data['trainName'] + ' || ' + "Journey Date: "+data['dateOfJourney'] + ' || ' + "Chart Status: " + data['chartStatus'])
         
