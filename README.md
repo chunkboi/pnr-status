@@ -11,3 +11,6 @@ python PNR_STATUS.py <10 digit PNR>
 
 #Reset Session
 python PNR_STATUS.py --reset
+
+
+[![CodeQL](https://github.com/chunkboi/pnr-status/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/chunkboi/pnr-status/actions/workflows/codeql-analysis.yml)
