@@ -16,4 +16,5 @@ python PNR_STATUS.py --reset
 [![CodeQL](https://github.com/chunkboi/pnr-status/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/chunkboi/pnr-status/actions/workflows/codeql-analysis.yml)
 [![OSSAR](https://github.com/chunkboi/pnr-status/actions/workflows/ossar.yml/badge.svg)](https://github.com/chunkboi/pnr-status/actions/workflows/ossar.yml)
 [![CodeFactor](https://www.codefactor.io/repository/github/chunkboi/pnr-status/badge)](https://www.codefactor.io/repository/github/chunkboi/pnr-status)
+[![DeepSource](https://deepsource.io/gh/chunkboi/pnr-status.svg/?label=active+issues&show_trend=true&token=8c9BSEqF2nTvN-EmrdZDeAAR)](https://deepsource.io/gh/chunkboi/pnr-status/)
 
