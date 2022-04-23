@@ -14,3 +14,4 @@ python PNR_STATUS.py --reset
 
 
 [![CodeQL](https://github.com/chunkboi/pnr-status/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/chunkboi/pnr-status/actions/workflows/codeql-analysis.yml)
+[![OSSAR](https://github.com/chunkboi/pnr-status/actions/workflows/ossar.yml/badge.svg)](https://github.com/chunkboi/pnr-status/actions/workflows/ossar.yml)
