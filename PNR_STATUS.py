@@ -141,7 +141,6 @@ def print_pnr(token,uuid,pnr):
     
      # moving in the JSON tree for easier access
 
-    #print('currentBerthCode' in passenger_multiple)
     
     if str(pnrDict['renderTemplate']['data']['departureTime']) == '0': # check if pnr is generated or not
         print("PNR NOT YET GENERATED OR FLUSHED")
@@ -149,7 +148,6 @@ def print_pnr(token,uuid,pnr):
     else:
         data = pnrDict['renderTemplate']['data']
         passenger = pnrDict['renderTemplate']['data']['passengerList']
-        #os.system('cls' if os.name == 'nt' else 'clear')
 
         print("Train Details: " + data['trainNumber'] + ' - ' + data['trainName'] + ' || ' + "Journey Date: "+data['dateOfJourney'] + ' || ' + "Chart Status: " + data['chartStatus'])
         
