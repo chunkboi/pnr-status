@@ -66,12 +66,12 @@ def setToken():
     token_req_res = post('https://assistant.corover.mobi/dishaAPI/bot/sendQuery/en',headers={
         'Accept': 'application/json, text/plain, */*'}, json=tokenDict)
 
-    
+
     token_json = loads(token_req_res.content.decode())
 
     print("setting token")
     time.sleep(0.5)
-    
+
     if "cxtoken" not in token_json:
         print("the otp is wrong")
         sys.exit()
@@ -123,7 +123,7 @@ def pnr_input():
 def getToken():
     with open(file_path) as f:
         content_list = [line.rstrip() for line in f]
-    
+
     token = content_list[0]
     return token
 
@@ -138,10 +138,10 @@ def print_pnr(token,uuid,pnr):
 
     pnrDict = loads(getPNRStatus(token,uuid,pnr))
 
-    
+
      # moving in the JSON tree for easier access
 
-    
+
     if str(pnrDict['renderTemplate']['data']['departureTime']) == '0': # check if pnr is generated or not
         print("PNR NOT YET GENERATED OR FLUSHED")
         sys.exit()
@@ -150,7 +150,7 @@ def print_pnr(token,uuid,pnr):
         passenger = pnrDict['renderTemplate']['data']['passengerList']
 
         print("Train Details: " + data['trainNumber'] + ' - ' + data['trainName'] + ' || ' + "Journey Date: "+data['dateOfJourney'] + ' || ' + "Chart Status: " + data['chartStatus'])
-        
+
         if int(data['numberOfpassenger']) == 1: # checking number of passenger
             if int(data['passengerList']['currentBerthNo']) == 0: # for WL and RAC tickets the currentBerthNo value will be the current status of the ticket so here we check if the ticket is WL/RAC or not if the value is 0 then the ticket was confirmed from the beginning
                 #print Coach and Seat No
@@ -165,7 +165,7 @@ def print_pnr(token,uuid,pnr):
                     print("Passenger " +  data['passengerList']['passengerSerialNumber'] + ': ' + data['passengerList']['currentStatus'] + '/'  + data['passengerList']['currentCoachId'] + '/' + data['passengerList']['currentBerthNo'] +'/'+data['passengerList']['currentBerthCode'] +" " + "Age: " + data['passengerList']['passengerAge'])
                 else:
                     print("Passenger " +  data['passengerList']['passengerSerialNumber'] + ': ' + data['passengerList']['currentStatus'] + '/'  + data['passengerList']['currentCoachId'] + '/' + data['passengerList']['currentBerthNo'] + " " + "Age: " + data['passengerList']['passengerAge'])
-                
+
         else:
             passenger_multiple = data['passengerList'][0]
             if data['passengerList'][0]['currentBerthNo'] == '0': #the currentBerthNo is in the passengerList so we need the list index to check for WL/RAC
@@ -182,14 +182,14 @@ def print_pnr(token,uuid,pnr):
                         print("Passenger " +  data['passengerList'][i]['passengerSerialNumber'] + ': ' + data['passengerList'][i]['currentStatus'] +'/' + data['passengerList'][i]['currentCoachId'] + '/' + data['passengerList'][i]['currentBerthNo'] + '/'+ data['passengerList'][i]['currentBerthCode']+ " " + "Age: " + data['passengerList'][i]['passengerAge'])
                     else:
                         print("Passenger " +  data['passengerList'][i]['passengerSerialNumber'] + ': ' + data['passengerList'][i]['currentStatus'] +'/' + data['passengerList'][i]['currentCoachId'] + '/' + data['passengerList'][i]['currentBerthNo'] + " " + "Age: " + data['passengerList'][i]['passengerAge'])
-                        
-                                
+
+
         print("Reservation From " + data['boardingPoint'] + " -> " + data['destinationStation'] )
         print("Quota: " + data['quota'])
         print("Journey Class: " + data['journeyClass'])
         print("Fare: " + "Rs." + data['ticketFare'])
-        
-        
+
+
 token = getToken()
 uuid = getUUID()
 
@@ -220,6 +220,6 @@ else:
         print_pnr(token,uuid,argv[1])
         end = time.time()
         print(f"total runtime was {end - begin} seconds")
-    
 
-        
+
+
