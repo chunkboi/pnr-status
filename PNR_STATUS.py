@@ -112,6 +112,7 @@ def pnr_input():
         print("It seems like you dont have a token")
         setToken()
     elif os.path.exists(file_path):
+        pnr = 0
         pnr = str(input("Enter PNR Number: "))
     if len(pnr) > 10 or len(pnr) < 10:
         print("the pnr is wrong")
@@ -121,6 +122,9 @@ def pnr_input():
 
 
 def getToken():
+    if not os.path.exists(file_path):
+        print("No token file")
+        sys.exit()
     with open(file_path) as f:
         content_list = [line.rstrip() for line in f]
 
@@ -128,6 +132,9 @@ def getToken():
     return token
 
 def getUUID():
+    if not os.path.exists(file_path):
+        print("No UUID file")
+        sys.exit()
     with open(file_path) as f:
         content_list = [line.rstrip() for line in f]
     uuid = content_list[1]
@@ -181,7 +188,7 @@ def print_pnr(token,uuid,pnr):
                     if 'currentBerthCode' in passenger_multiple:
                         print("Passenger " +  data['passengerList'][i]['passengerSerialNumber'] + ': ' + data['passengerList'][i]['currentStatus'] +'/' + data['passengerList'][i]['currentCoachId'] + '/' + data['passengerList'][i]['currentBerthNo'] + '/'+ data['passengerList'][i]['currentBerthCode']+ " " + "Age: " + data['passengerList'][i]['passengerAge'])
                     else:
-                        print("Passenger " +  data['passengerList'][i]['passengerSerialNumber'] + ': ' + data['passengerList'][i]['currentStatus'] +'/' + data['passengerList'][i]['currentCoachId'] + '/' + data['passengerList'][i]['currentBerthNo'] + " " + "Age: " + data['passengerList'][i]['passengerAge'])
+                        print("Passenger " + data['passengerList'][i]['passengerSerialNumber'] + ': ' + data['passengerList'][i]['currentStatus'] +'/' + data['passengerList'][i]['currentCoachId'] + '/' + data['passengerList'][i]['currentBerthNo'] + " " + "Age: " + data['passengerList'][i]['passengerAge'])
 
 
         print("Reservation From " + data['boardingPoint'] + " -> " + data['destinationStation'] )
@@ -189,14 +196,18 @@ def print_pnr(token,uuid,pnr):
         print("Journey Class: " + data['journeyClass'])
         print("Fare: " + "Rs." + data['ticketFare'])
 
-
-token = getToken()
-uuid = getUUID()
+if os.path.exists(file_path):
+    token = getToken()
+    uuid = getUUID()
+else:
+    setToken()
+    token = getToken()
+    uuid = getUUID()
 
 if len(argv) == 1:
     pnr = pnr_input()
     begin = time.time()
-    print_pnr(token,uuid,pnr)
+    print_pnr(token, uuid, pnr)
     end = time.time()
     print(f"total runtime was {end - begin} seconds")
 else:
