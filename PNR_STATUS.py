@@ -56,12 +56,12 @@ def setToken():
     "userToken":"bruh"
     }
     otp = str(input("enter otp: "))
-    if len(otp) > 6 or len(otp) < 6:
+    if len(otp) > 6 or len(otp) < 6: # otp input validation
         print("the otp is wrong")
         sys.exit()
     tokenDict['cxpayload']['otpuuid'] = otp_uuid
     tokenDict['userToken'] = const.RANDOM_UUID
-    tokenDict['cxpayload']['otp'] = otp
+    tokenDict['cxpayload']['otp'] = otp # setting objects for requests
 
     token_req_res = post('https://assistant.corover.mobi/dishaAPI/bot/sendQuery/en',headers={
         'Accept': 'application/json, text/plain, */*'}, json=tokenDict)
@@ -72,13 +72,13 @@ def setToken():
     print("setting token")
     time.sleep(0.5)
 
-    if "cxtoken" not in token_json:
+    if "cxtoken" not in token_json: # checking for token in the response body
         print("the otp is wrong")
         sys.exit()
 
     token = token_json['cxtoken']
 
-    with open(file_path, 'w') as file:
+    with open(file_path, 'w') as file: # writing token  to file
         file.write(token + '\n')
         file.write(const.RANDOM_UUID)
     print("Set Token Success")
@@ -109,12 +109,12 @@ def getPNRStatus(token, uuid,pnr):
 
 def pnr_input():
     if not os.path.exists(file_path):
-        print("It seems like you dont have a token")
+        print("It seems like you dont have a token") # token check
         setToken()
     elif os.path.exists(file_path):
         pnr = 0
         pnr = str(input("Enter PNR Number: "))
-    if len(pnr) > 10 or len(pnr) < 10:
+    if len(pnr) > 10 or len(pnr) < 10: # pnr bounds check
         print("the pnr is wrong")
         sys.exit()
     else:
@@ -122,21 +122,21 @@ def pnr_input():
 
 
 def getToken():
-    if not os.path.exists(file_path):
+    if not os.path.exists(file_path): # get token from file
         print("No token file")
         sys.exit()
     with open(file_path) as f:
-        content_list = [line.rstrip() for line in f]
+        content_list = [line.rstrip() for line in f] # separating uuid and token
 
     token = content_list[0]
     return token
 
 def getUUID():
-    if not os.path.exists(file_path):
+    if not os.path.exists(file_path): # get uuid from file
         print("No UUID file")
         sys.exit()
     with open(file_path) as f:
-        content_list = [line.rstrip() for line in f]
+        content_list = [line.rstrip() for line in f] # separating token and uuid
     uuid = content_list[1]
     return uuid
 
@@ -145,39 +145,36 @@ def print_pnr(token,uuid,pnr):
 
     pnrDict = loads(getPNRStatus(token,uuid,pnr))
 
-
-     # moving in the JSON tree for easier access
-
-
     if str(pnrDict['renderTemplate']['data']['departureTime']) == '0': # check if pnr is generated or not
         print("PNR NOT YET GENERATED OR FLUSHED")
         sys.exit()
     else:
-        data = pnrDict['renderTemplate']['data']
+        data = pnrDict['renderTemplate']['data'] # moving in the JSON tree for easier access
         passenger = pnrDict['renderTemplate']['data']['passengerList']
 
-        print("Train Details: " + data['trainNumber'] + ' - ' + data['trainName'] + ' || ' + "Journey Date: "+data['dateOfJourney'] + ' || ' + "Chart Status: " + data['chartStatus'])
+        print("Train Details: " + data['trainNumber'] + ' - ' + data['trainName'] + ' || ' + "Journey Date: "+data['dateOfJourney'] + ' || ' + "Chart Status: " + data['chartStatus']) # printing train details
 
         if int(data['numberOfpassenger']) == 1: # checking number of passenger
             if int(data['passengerList']['currentBerthNo']) == 0: # for WL and RAC tickets the currentBerthNo value will be the current status of the ticket so here we check if the ticket is WL/RAC or not if the value is 0 then the ticket was confirmed from the beginning
-                #print Coach and Seat No
-                if 'bookingBerthCode' in passenger:
+                # print Coach and Seat No
+                if 'bookingBerthCode' in passenger: # checking for berth code
                     print("Passenger " +  data['passengerList']['passengerSerialNumber'] + ': ' + data['passengerList']['bookingStatus'] + '/'  + data['passengerList']['bookingCoachId'] +'/' + data['passengerList']['bookingBerthNo'] + "/" + data['passengerList']['bookingBerthCode'] +' ' + "Age: " + data['passengerList']['passengerAge'])
                 else:
                     print("Passenger " +  data['passengerList']['passengerSerialNumber'] + ': ' + data['passengerList']['bookingStatus'] + '/'  + data['passengerList']['bookingCoachId'] +'/' + data['passengerList']['bookingBerthNo'] +' ' + "Age: " + data['passengerList']['passengerAge'])
 
             else:
-                #print the WL/RAC position
-                if 'currentBerthCode' in passenger:
+
+                if 'currentBerthCode' in passenger: # checking for Berth Code
                     print("Passenger " +  data['passengerList']['passengerSerialNumber'] + ': ' + data['passengerList']['currentStatus'] + '/'  + data['passengerList']['currentCoachId'] + '/' + data['passengerList']['currentBerthNo'] +'/'+data['passengerList']['currentBerthCode'] +" " + "Age: " + data['passengerList']['passengerAge'])
                 else:
                     print("Passenger " +  data['passengerList']['passengerSerialNumber'] + ': ' + data['passengerList']['currentStatus'] + '/'  + data['passengerList']['currentCoachId'] + '/' + data['passengerList']['currentBerthNo'] + " " + "Age: " + data['passengerList']['passengerAge'])
 
         else:
             passenger_multiple = data['passengerList'][0]
+
             if data['passengerList'][0]['currentBerthNo'] == '0': #the currentBerthNo is in the passengerList so we need the list index to check for WL/RAC
                 for i in range(int(data['numberOfpassenger'])):#looping through the number of passengers to print all the passenger data for multiple passengers
-                    if 'bookingBerthCode' in passenger_multiple:
+                    if 'bookingBerthCode' in passenger_multiple: #checking for berth code
                         print("Passenger " +  data['passengerList'][i]['passengerSerialNumber'] + ': ' + data['passengerList'][i]['bookingStatus'] + '/'  + data['passengerList'][i]['bookingCoachId'] +'/' + data['passengerList'][i]['bookingBerthNo'] +'/' + data['passengerList'][i]['bookingBerthCode'] +" " + "Age: " + data['passengerList'][i]['passengerAge'])                
                     else:
                         print("Passenger " +  data['passengerList'][i]['passengerSerialNumber'] + ': ' + data['passengerList'][i]['bookingStatus'] + '/'  + data['passengerList'][i]['bookingCoachId'] +'/' + data['passengerList'][i]['bookingBerthNo'] +" " + "Age: " + data['passengerList'][i]['passengerAge'])
@@ -185,7 +182,7 @@ def print_pnr(token,uuid,pnr):
 
             else:
                 for i in range(int(data['numberOfpassenger'])):  #looping for printing WL/RAC position
-                    if 'currentBerthCode' in passenger_multiple:
+                    if 'currentBerthCode' in passenger_multiple: # for berth code for RAC tickets
                         print("Passenger " +  data['passengerList'][i]['passengerSerialNumber'] + ': ' + data['passengerList'][i]['currentStatus'] +'/' + data['passengerList'][i]['currentCoachId'] + '/' + data['passengerList'][i]['currentBerthNo'] + '/'+ data['passengerList'][i]['currentBerthCode']+ " " + "Age: " + data['passengerList'][i]['passengerAge'])
                     else:
                         print("Passenger " + data['passengerList'][i]['passengerSerialNumber'] + ': ' + data['passengerList'][i]['currentStatus'] +'/' + data['passengerList'][i]['currentCoachId'] + '/' + data['passengerList'][i]['currentBerthNo'] + " " + "Age: " + data['passengerList'][i]['passengerAge'])
@@ -204,17 +201,17 @@ else:
     token = getToken()
     uuid = getUUID()
 
-if len(argv) == 1:
+if len(argv) == 1: # if there are no arguments then use fallback option
     pnr = pnr_input()
     begin = time.time()
     print_pnr(token, uuid, pnr)
     end = time.time()
     print(f"total runtime was {end - begin} seconds")
 else:
-    if len(argv) > 2:
+    if len(argv) > 2: # args bounds check
         print("Too Many Arguments" + '\n' + f"Correct Usage python {os.path.basename(__file__)} " + "<10 digit PNR>" + " or --reset")
         sys.exit()
-    elif argv[1] == "--reset":
+    elif argv[1] == "--reset": # delete the session file
         choice = str(input("Do you really want to Reset your session Y for yes and N for no: "))
         if choice == 'Y':
             os.remove(file_path)
@@ -223,11 +220,11 @@ else:
         elif choice == 'N':
             print("Didn't Clear Session")
             sys.exit()
-    elif len(argv[1]) != 10:
+    elif len(argv[1]) != 10: # pnr input validation
         print("The PNR is Not 10 digits long" + '\n' + f"Correct Usage python {os.path.basename(__file__)} " + "<10 digit PNR>" + " or --reset" )
         sys.exit()
     elif len(argv[1]) == 10:
-        begin = time.time()
+        begin = time.time() # runtime
         print_pnr(token,uuid,argv[1])
         end = time.time()
         print(f"total runtime was {end - begin} seconds")
