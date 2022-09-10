@@ -2,21 +2,17 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives import padding
 from cryptography.hazmat.backends import default_backend
 from base64 import b64decode, b64encode
-from requests import get, post
+from requests import post
 from json import loads
 from subprocess import call
 
 import os
 import time
-
+import sys
 
 def clear():
-    # check and make call for specific operating system
-    if os.name == 'posix':
-        call(["clear"], shell=True)
-    else:
-        call(["cls"], shell=True)
-    
+    #clear screen by printing tons of newlines
+    print('\n'* 1000)
 clear()
 
 # encrypt pnr with key and iv stole it from https://stackoverflow.com/questions/50062663/encryption-decryption-using-aes-cbc-pkcs7padding
@@ -43,7 +39,6 @@ def printData(json_data):
     trainNumber = json_data["trainNumber"]
     trainName = json_data["trainName"]
     dateOfJourney = json_data["dateOfJourney"]    
-    #chartStatus = json_data["chartStatus"]
     
     print("PNR STATUS")
     print("------------------------------------------------------------------")
@@ -65,7 +60,7 @@ start = time.time()
 #input validation pnr should be 10 digits
 if len(pnr) != 10:
     print("PNR LENGTH should be 10 DIGITS")
-    exit(0)
+    sys.exit(0)
    
     
 json_data = {
