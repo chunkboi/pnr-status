@@ -4,7 +4,6 @@ from cryptography.hazmat.backends import default_backend
 from base64 import b64decode, b64encode
 from requests import get, post
 from json import loads
-from sys import exit
 from subprocess import call
 
 import os
@@ -13,7 +12,10 @@ import time
 
 def clear():
     # check and make call for specific operating system
-    _ = os.system('clear' if os.name == 'posix' else 'cls')
+    if os.name == 'posix':
+        call(["clear"], shell=True)
+    else:
+        call(["cls"], shell=True)
     
 clear()
 
@@ -22,7 +24,7 @@ def getEncryptedPNR(pnr):
     data = bytes(pnr, 'utf-8')
     backend = default_backend()
     padder = padding.PKCS7(128).padder()
-    unpadder = padding.PKCS7(128).unpadder()
+    
     data = padder.update(data) + padder.finalize()
     key = b'8080808080808080'
     iv = b'8080808080808080'
@@ -40,11 +42,9 @@ def printData(json_data):
     className = json_data["className"]
     trainNumber = json_data["trainNumber"]
     trainName = json_data["trainName"]
-    dateOfJourney = json_data["dateOfJourney"]
+    dateOfJourney = json_data["dateOfJourney"]    
+    #chartStatus = json_data["chartStatus"]
     
-    
-    
-    chartStatus = json_data["chartStatus"]
     print("PNR STATUS")
     print("------------------------------------------------------------------")
     print(boardingStation + " -> " + destinationStation) # source and destination station
