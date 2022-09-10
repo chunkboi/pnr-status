@@ -4,9 +4,6 @@ from cryptography.hazmat.backends import default_backend
 from base64 import b64decode, b64encode
 from requests import post
 from json import loads
-from subprocess import call
-
-import os
 import time
 import sys
 
