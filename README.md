@@ -1,5 +1,5 @@
 # PNR-STATUS
-Check the PNR status for Indian Railways using the EaseMyTrip API
+Check the PNR status for Indian Railways using the MakeMyTrip API
 
 
 # Usage
