@@ -1,13 +1,38 @@
-from requests import post
-from subprocess import call
-from json import loads
-from os import name
-from time import time
+from subprocess import call, run
 
+
+
+try:
+    from requests import post 
+    from json import loads
+    from os import name
+    from time import perf_counter
+    import http.client as httplib
+    
+except ModuleNotFoundError:
+    print("Core modules not found trying to install them")
+    run(["pip", "install", "requests"],check=True, text=True)
+    
+except:
+    print("Some Error Occurred, could not import libraries")
+    exit(0)
+    
 def clear():
     #clear screen
     call(["clear"] if name == 'posix' else ["cls"], shell=True)
-  
+      
+clear()
+def connect():
+    conn = httplib.HTTPSConnection("8.8.8.8", timeout=5)
+    try:
+        conn.request("HEAD", "/")
+        return True
+    except Exception:
+        return False
+    finally:
+        conn.close()
+
+
 
 def printData(json_data):
     train_number = json_data["TrainDetails"]["Train"]["Number"]
@@ -41,10 +66,15 @@ headers = {
 }
 
 pnr = input("Enter PNR number: ")
-start = time()
+start = perf_counter()
 if len(pnr) != 10: # pnr validation
     print("PNR LENGTH should be 10 DIGITS")
-    sys.exit(0)
+    exit(0)
+    
+if not connect():
+    print("Connect To a network to check PNR STATUS")
+    exit(0)
+
    
     
 json = {
@@ -58,7 +88,7 @@ json = {
 response = post('https://mapi.makemytrip.com/api/rails/pnr/currentstatus/v1',headers=headers, json=json)
 
 json_data = loads(response.content)
-end = time()
+end = perf_counter()
 clear()
 printData(json_data)
 print(f"Total time taken: {round(end - start, 3)} seconds") # print total time taken to complete the program
