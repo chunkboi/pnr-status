@@ -1,7 +1,5 @@
 from subprocess import call, run
 
-
-
 try:
     from requests import post 
     from json import loads
@@ -57,16 +55,23 @@ def printData(json_data):
     for p in json_data["PassengerDetails"]["PassengerStatus"]:
         print("Passenger " + str(p["Number"]) + ": " + p["CurrentStatus"])
     
+pnr = input("Enter PNR number: ")
     
-    
-
+json = {
+    'pnrID': pnr,
+    'trackingParams': {
+        'affiliateCode': 'MMT001',
+        'channelCode': 'WEB',
+    },
+}
 headers = {
     'accept': 'application/json',
     'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36',   
 }
 
-pnr = input("Enter PNR number: ")
+
 start = perf_counter()
+
 if len(pnr) != 10: # pnr validation
     print("PNR LENGTH should be 10 DIGITS")
     exit(0)
@@ -77,18 +82,18 @@ if not connect():
 
    
     
-json = {
-    'pnrID': pnr,
-    'trackingParams': {
-        'affiliateCode': 'MMT001',
-        'channelCode': 'WEB',
-    },
-}
+
 
 response = post('https://mapi.makemytrip.com/api/rails/pnr/currentstatus/v1',headers=headers, json=json)
 
 json_data = loads(response.content)
+if "Error" in json_data:
+    print(json_data["Error"]["message"])
+    end = perf_counter()
+    print(f"Total time taken: {round(end - start, 3)} seconds")
+    exit(0)
+
 end = perf_counter()
-clear()
+
 printData(json_data)
 print(f"Total time taken: {round(end - start, 3)} seconds") # print total time taken to complete the program
