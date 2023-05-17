@@ -1,3 +1,16 @@
+import subprocess
+
+REQUIRED_PACKAGES = ['cryptography', 'requests']
+
+# Check if the required packages are installed
+for package in REQUIRED_PACKAGES:
+    try:
+        __import__(package)
+    except ImportError:
+        # Package is not installed, so attempt to install it
+        subprocess.check_call(['pip', 'install', package])
+
+
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives import padding
 from cryptography.hazmat.backends import default_backend
@@ -9,9 +22,9 @@ import sys
 import os
 
 def clear_screen():
-    """Clears the console screen"""
-   os.system("cls" if os.name == "nt" else "clear")
-
+    # Clear screen
+    os.system("cls" if os.name == "nt" else "clear")
+    
 def encrypt_pnr(pnr):
     """Encrypts the PNR number using AES CBC encryption with PKCS7 padding.
 
