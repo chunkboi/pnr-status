@@ -66,7 +66,7 @@ json_data = {
 
 
 # do a post request to the url with encrypted pnr
-response = post('https://railways.easemytrip.com/Train/PnrchkStatus', json=json_data)
+response = post('https://railways.easemytrip.com/Train/PnrchkStatus', json=json_data, verify=False)
 json_data = loads(response.content) # parse response content into json
 
 
