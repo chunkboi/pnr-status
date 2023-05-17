@@ -1,23 +1,31 @@
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives import padding
 from cryptography.hazmat.backends import default_backend
-from base64 import b64decode, b64encode
+from base64 import b64encode
 from requests import post
 from json import loads
 import time
 import sys
+import os
 
-def clear():
-    #clear screen by printing tons of newlines
-    print('\n'* 1000)
-clear()
+def clear_screen():
+    """Clears the console screen"""
+   os.system("cls" if os.name == "nt" else "clear")
 
-# encrypt pnr with key and iv stole it from https://stackoverflow.com/questions/50062663/encryption-decryption-using-aes-cbc-pkcs7padding
-def getEncryptedPNR(pnr):
+def encrypt_pnr(pnr):
+    """Encrypts the PNR number using AES CBC encryption with PKCS7 padding.
+
+    Args:
+        pnr (str): The PNR number to encrypt.
+
+    Returns:
+        str: The base64-encoded encrypted PNR.
+
+    """
     data = bytes(pnr, 'utf-8')
     backend = default_backend()
     padder = padding.PKCS7(128).padder()
-    
+
     data = padder.update(data) + padder.finalize()
     key = b'8080808080808080'
     iv = b'8080808080808080'
@@ -27,51 +35,85 @@ def getEncryptedPNR(pnr):
     enc_pnr = b64encode(ct)
     return enc_pnr.decode('utf-8')
 
- # format response json and print it
-def printData(json_data):
-    boardingStation = json_data["BrdPointName"]
-    destinationStation = json_data["DestStnName"]
-    quota = json_data["quota"]
-    className = json_data["className"]
-    trainNumber = json_data["trainNumber"]
-    trainName = json_data["trainName"]
-    dateOfJourney = json_data["dateOfJourney"]    
+def print_pnr_data(json_data):
+    """Prints the formatted PNR status information.
+
+    Args:
+        json_data (dict): JSON data containing the PNR status information.
+
+    Raises:
+        KeyError: If the required keys are missing in the JSON data.
+
+    """
+    try:
+        boarding_station = json_data["BrdPointName"]
+        destination_station = json_data["DestStnName"]
+        quota = json_data["quota"]
+        class_name = json_data["className"]
+        train_number = json_data["trainNumber"]
+        train_name = json_data["trainName"]
+        date_of_journey = json_data["dateOfJourney"]
+
+        print("PNR STATUS")
+        print("------------------------------------------------------------------")
+        print(f"{boarding_station} -> {destination_station}")  # source and destination station
+        print(f"{train_number} - {train_name}")  # train number and name
+        print()
+        print(f"Quota: {quota}")
+        print(f"Journey Class: {class_name}")
+        print(f"Date Of Journey: {date_of_journey}")
+        print()
+        for passenger in json_data["passengerList"]:
+            passenger_serial_number = passenger["passengerSerialNumber"]
+            current_status = passenger["currentStatus"]
+            current_coach_id = passenger["currentCoachId"]
+            current_berth_no = passenger["currentBerthNo"]
+            print(f"Passenger {passenger_serial_number}: {current_status}/{current_coach_id}/{current_berth_no}")
+    except KeyError as e:
+        raise KeyError("Invalid JSON data format. Missing key: " + str(e))
+
+def main():
+    clear_screen()
+
+    pnr = input("Enter PNR Number: ")
+    start_time = time.time()
+
+    # Input validation: PNR should be 10 digits
+    if len(pnr) != 10:
+        print("PNR LENGTH should be 10 DIGITS")
+        sys.exit(1)
+
+    encrypted_pnr = encrypt_pnr(pnr)
+
+    json_data = {
+        'pnrNumber': encrypted_pnr,
+    }
+
+    try:
+        # Perform a POST request to the API endpoint with the encrypted PNR
+        response = post('https://railways.easemytrip.com/Train/PnrchkStatus', json=json_data, verify=True)
+        response.raise_for_status()
+        json_data = loads(response.content)
+    except (ConnectionError, TimeoutError, requests.exceptions.RequestException) as e:
+        print("An error occurred while connecting to the API:", str(e))
+        sys.exit(1)
+    except ValueError as e:
+        print("Invalid response from the API. Response cannot be parsed as JSON.")
+        sys.exit(1)
+    except Exception as e:
+        print("An error occurred:", str(e))
+        sys.exit(1)
+
+    clear_screen()
+    end_time = time.time()
     
-    print("PNR STATUS")
-    print("------------------------------------------------------------------")
-    print(boardingStation + " -> " + destinationStation) # source and destination station
-    print(trainNumber + ' - ' + trainName) # train number and name
-    print()
-    print("Quota: " + quota)
-    print("Journey Class: " + className)
-    print("Date Of Journey: " + dateOfJourney)
-    print()
-    for p in json_data["passengerList"]:
-        print("Passenger " + p["passengerSerialNumber"] + ": " + p["currentStatus"] + '/' + p["currentCoachId"] + '/' + p["currentBerthNo"])
+    try:
+        print_pnr_data(json_data)
+    except KeyError as e:
+        print("An error occurred while parsing the API response:", str(e))
+        sys.exit(1)
+        
+    print(f"Total time taken: {round(end_time - start_time, 3)} seconds")
 
-
-
-pnr = input("Enter PNR Number: ") #  recieve PNR number
-start = time.time()
-
-#input validation pnr should be 10 digits
-if len(pnr) != 10:
-    print("PNR LENGTH should be 10 DIGITS")
-    sys.exit(0)
-   
-    
-json_data = {
-    'pnrNumber': getEncryptedPNR(pnr),
-}
-
-
-# do a post request to the url with encrypted pnr
-response = post('https://railways.easemytrip.com/Train/PnrchkStatus', json=json_data, verify=False)
-json_data = loads(response.content) # parse response content into json
-
-
-clear()
-end = time.time()
-printData(json_data)
-print(f"Total time taken: {round(end - start, 3)} seconds") # print total time taken to complete the program
-
+if __name__ == "__main__":
+    main()
