@@ -1,26 +1,13 @@
-from subprocess import call, run
+import requests
+import os
+import time
+import http.client as httplib
 
-try:
-    from requests import post 
-    from json import loads
-    from os import name
-    from time import perf_counter
-    import http.client as httplib
-    
-except ModuleNotFoundError:
-    print("Core modules not found trying to install them")
-    run(["pip", "install", "requests"],check=True, text=True)
-    
-except:
-    print("Some Error Occurred, could not import libraries")
-    exit(0)
-    
-def clear():
-    #clear screen
-    call(["clear"] if name == 'posix' else ["cls"], shell=True)
-      
-clear()
-def connect():
+def clear_screen():
+    # Clear screen
+    os.system("cls" if os.name == "nt" else "clear")
+
+def check_network_connection():
     conn = httplib.HTTPSConnection("8.8.8.8", timeout=5)
     try:
         conn.request("HEAD", "/")
@@ -30,9 +17,7 @@ def connect():
     finally:
         conn.close()
 
-
-
-def printData(json_data):
+def print_pnr_status(json_data):
     train_number = json_data["TrainDetails"]["Train"]["Number"]
     train_name = json_data["TrainDetails"]["Train"]["Name"]
     chart_status = json_data["TrainDetails"]["ChartPrepared"]
@@ -52,48 +37,67 @@ def printData(json_data):
     print("Class: " + class_name)
     print("Date Of Journey: " + date_of_journey)
     print()
-    for p in json_data["PassengerDetails"]["PassengerStatus"]:
-        print("Passenger " + str(p["Number"]) + ": " + p["CurrentStatus"])
+    for passenger in json_data["PassengerDetails"]["PassengerStatus"]:
+        print(f"Passenger {passenger['Number']}: {passenger['CurrentStatus']}")
+
+def main():
+    clear_screen()
     
-pnr = input("Enter PNR number: ")
+    try:
+        import requests
+        from json import loads
+    except ImportError:
+        print("Required libraries not found. Trying to install them...")
+        os.system("pip install requests")
+        try:
+            import requests
+            from json import loads
+        except ImportError:
+            print("Failed to install required libraries. Please install 'requests' manually.")
+            return
     
-json = {
-    'pnrID': pnr,
-    'trackingParams': {
-        'affiliateCode': 'MMT001',
-        'channelCode': 'WEB',
-    },
-}
-headers = {
-    'accept': 'application/json',
-    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36',   
-}
-
-
-start = perf_counter()
-
-if len(pnr) != 10: # pnr validation
-    print("PNR LENGTH should be 10 DIGITS")
-    exit(0)
+    pnr = input("Enter PNR number: ")
     
-if not connect():
-    print("Connect To a network to check PNR STATUS")
-    exit(0)
-
-   
+    if len(pnr) != 10:
+        print("PNR length should be 10 digits.")
+        return
     
+    if not check_network_connection():
+        print("Please connect to a network to check PNR status.")
+        return
+    
+    json = {
+        'pnrID': pnr,
+        'trackingParams': {
+            'affiliateCode': 'MMT001',
+            'channelCode': 'WEB',
+        },
+    }
+    headers = {
+        'accept': 'application/json',
+        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36',
+    }
+    
+    start_time = time.perf_counter()
+    
+    try:
+        response = requests.post('https://mapi.makemytrip.com/api/rails/pnr/currentstatus/v1', headers=headers, json=json)
+        response.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        print("An error occurred while making the API request:", str(e))
+        return
+    
+    json_data = loads(response.content)
+    if "Error" in json_data:
+        print(json_data["Error"]["message"])
+        end_time = time.perf_counter()
+        print(f"Total time taken: {round(end_time - start_time, 3)} seconds")
+        return
+    
+    end_time = time.perf_counter()
+    
+    print_pnr_status(json_data)
+    print(f"Total time taken: {round(end_time - start_time, 3)} seconds")
 
-
-response = post('https://mapi.makemytrip.com/api/rails/pnr/currentstatus/v1',headers=headers, json=json)
-
-json_data = loads(response.content)
-if "Error" in json_data:
-    print(json_data["Error"]["message"])
-    end = perf_counter()
-    print(f"Total time taken: {round(end - start, 3)} seconds")
-    exit(0)
-
-end = perf_counter()
-
-printData(json_data)
-print(f"Total time taken: {round(end - start, 3)} seconds") # print total time taken to complete the program
+if __name__ == "__main__":
+    main()
