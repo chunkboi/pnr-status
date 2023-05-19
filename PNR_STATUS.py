@@ -3,10 +3,12 @@ import time
 import http.client as httplib
 import logging
 from json import loads
+from requests.exceptions import RequestException
 
 PNR_LENGTH = 10
 API_ENDPOINT = 'https://mapi.makemytrip.com/api/rails/pnr/currentstatus/v1'
-
+MAX_RETRIES = 3
+RETRY_DELAY = 1  # Number of seconds to wait between retries
 
 def clear_screen():
     # Clear screen
@@ -89,15 +91,20 @@ def get_pnr_status(pnr):
         'accept': 'application/json',
         'user-agent': UserAgent().random,
     }
-
-    try:
-        response = requests.post(API_ENDPOINT, headers=headers, json=json)
-        response.raise_for_status()
-        json_data = loads(response.content)
-    except requests.exceptions.RequestException as e:
-        logging.error("An error occurred while making the API request: %s", str(e))
-    except ValueError:
-        logging.error("Invalid JSON data received from the API.")
+    for _ in range(MAX_RETRIES):
+        try:
+            response = requests.post(API_ENDPOINT, headers=headers, json=json)
+            response.raise_for_status()
+            json_data = loads(response.content)
+            break  # Break the loop if the request is successful
+        except RequestException as e:
+            logging.error(f"An error occurred while making the API request: {str(e)}")
+            time.sleep(RETRY_DELAY)
+            exit(1)
+        except Exception as e:
+            logging.error(str(e))
+            time.sleep(RETRY_DELAY)
+            exit(1)
 
     return json_data
 
