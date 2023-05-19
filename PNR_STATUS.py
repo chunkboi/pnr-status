@@ -1,14 +1,16 @@
 import os
 import time
-import http.client as httplib
 import logging
+import http.client as httplib
 from json import loads
 from requests.exceptions import RequestException
+
 
 PNR_LENGTH = 10
 API_ENDPOINT = 'https://mapi.makemytrip.com/api/rails/pnr/currentstatus/v1'
 MAX_RETRIES = 3
 RETRY_DELAY = 1  # Number of seconds to wait between retries
+
 
 def clear_screen():
     """Clears the console screen."""
@@ -21,14 +23,16 @@ def check_network_connection():
     Returns:
         bool: True if the network connection is available, False otherwise.
     """
-    conn = httplib.HTTPSConnection("8.8.8.8", timeout=5)
+    conn = None
     try:
+        conn = httplib.HTTPSConnection("8.8.8.8", timeout=5)
         conn.request("HEAD", "/")
         return True
     except Exception:
         return False
     finally:
-        conn.close()
+        if conn is not None:
+            conn.close()
 
 
 def print_pnr_status(json_data):
@@ -66,7 +70,7 @@ def install_required_libraries():
         bool: True if all required libraries are installed or already present,
               False if any library installation fails.
     """
-    required_libraries = ["argparse", "requests", "fake_useragent"]
+    required_libraries = ["argparse", "requests"]
 
     missing_libraries = []
     for library in required_libraries:
@@ -77,13 +81,18 @@ def install_required_libraries():
 
     if missing_libraries:
         print("Required libraries not found. Trying to install them...")
+
+        import subprocess
         for library in missing_libraries:
-            os.system(f"pip install {library}")
-            try:
-                __import__(library)
-            except ImportError:
-                print(f"Failed to install {library}. Please install it manually.")
-                return False
+            subprocess.check_call(['pip', 'install', library])
+
+        try:
+            import argparse
+            import requests
+            from fake_useragent import UserAgent
+        except ImportError as e:
+            logging.error(f"Failed to import required libraries: {str(e)}")
+            return False
 
         clear_screen()  # Clear the screen after installing missing libraries
 
@@ -100,7 +109,6 @@ def get_pnr_status(pnr):
         dict: JSON data containing the PNR status details.
     """
     import requests
-    from fake_useragent import UserAgent
 
     json_data = None
 
@@ -113,8 +121,9 @@ def get_pnr_status(pnr):
     }
     headers = {
         'accept': 'application/json',
-        'user-agent': UserAgent().random,
+        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36',
     }
+
     for _ in range(MAX_RETRIES):
         try:
             response = requests.post(API_ENDPOINT, headers=headers, json=json)
@@ -124,11 +133,9 @@ def get_pnr_status(pnr):
         except RequestException as e:
             logging.error(f"An error occurred while making the API request: {str(e)}")
             time.sleep(RETRY_DELAY)
-            exit(1)
         except Exception as e:
             logging.error(str(e))
             time.sleep(RETRY_DELAY)
-            exit(1)
 
     return json_data
 
