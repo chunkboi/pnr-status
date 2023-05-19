@@ -1,55 +1,62 @@
+#Certainly! Here's the documentation for the script in raw Markdown:
+
 # PNR Status Checker
 
-The PNR Status Checker script allows you to check the status of a train ticket using the Passenger Name Record (PNR) number. It retrieves the status by making an API request to the MakeMyTrip API and displays the relevant information.
+The PNR Status Checker is a Python script that allows users to check the status of their PNR (Passenger Name Record) for Indian Railways. It retrieves real-time information about the train, chart preparation, and passenger details.
+
+## Features
+
+- Retrieves PNR status details from the MakeMyTrip API.
+- Validates the format and length of the PNR.
+- Checks network connectivity before making the API request.
+- Displays the PNR status information on the console.
+
+## Prerequisites
+
+To run the PNR Status Checker script, ensure that you have the following prerequisites:
+
+- Python 3.x installed on your system.
+- Internet connectivity to make the API request.
+- Required libraries installed (they will be automatically installed if missing).
 
 ## Usage
 
-1. Run the script using Python.
-2. Enter the 10-digit PNR number when prompted.
-3. The script will connect to the API and retrieve the status information.
-4. The PNR status, including train details, chart preparation status, passenger details, and journey information, will be displayed.
+1. Open a terminal or command prompt.
 
-## Requirements
+2. Navigate to the directory containing the script.
 
-- Python 3.x
-- `requests` library (will be installed automatically if not found)
+3. Run the script with the following command:
+
+```shell
+python pnr_status_checker.py <pnr>
+```
+
+Replace `<pnr>` with the actual PNR number you want to check.
+
+4. The script will retrieve the PNR status information and display it on the console.
 
 ## Code Structure
 
-The script is organized into the following functions:
+The code is organized into several functions to handle different aspects of the PNR status checking process. Here's an overview of the code structure:
 
-1. `clear_screen()`
-   - Clears the console screen.
+- Import Statements: The necessary libraries and modules are imported.
 
-2. `check_network_connection()`
-   - Checks the network connection by making a request to a known server.
-   - Returns `True` if the connection is successful, `False` otherwise.
+- Constants: Two constants are defined: `PNR_LENGTH` and `API_ENDPOINT`.
 
-3. `print_pnr_status(json_data)`
-   - Extracts and prints the PNR status information from the retrieved JSON data.
-   - Displays train details, chart preparation status, passenger details, and journey information.
+- Utility Functions: Functions for clearing the screen, checking network connection, printing PNR status, installing required libraries, getting PNR status, validating PNR, parsing command-line arguments, and setting up logging.
 
-4. `main()`
-   - The main function of the script.
-   - Checks for required libraries (`requests`, `json`).
-   - Prompts the user to enter the PNR number.
-   - Validates the PNR number.
-   - Checks network connectivity.
-   - Makes an API request to the MakeMyTrip API to retrieve the PNR status.
-   - Parses and displays the PNR status information.
+- Main Function: The main entry point of the script that orchestrates the PNR status checking process.
 
-## How to Run
+## Logging
 
-1. Install Python 3.x from [https://www.python.org/downloads/](https://www.python.org/downloads/).
-2. Save the script in a file (e.g., `pnr_status_checker.py`).
-3. Open a command prompt or terminal.
-4. Navigate to the directory containing the script.
-5. Run the script using the command: `python pnr_status_checker.py`
-6. Follow the on-screen prompts to enter the PNR number and view the status.
+The script utilizes the logging module to provide informative messages and error handling. The log messages are displayed on the console with the log level prefix in square brackets, such as `[INFO]` or `[ERROR]`.
+
+## Error Handling
+
+The script performs error handling for various scenarios, such as invalid PNR, network connectivity issues, API request failures, and missing required libraries. Detailed error messages are displayed on the console for troubleshooting.
 
 **Note:**
 - Ensure you have an active internet connection to fetch the PNR status information.
-- The MakeMyTrip API is used to retrieve the PNR status, so make sure the API is accessible.
 
 
 [![CodeQL](https://github.com/chunkboi/pnr-status/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/chunkboi/pnr-status/actions/workflows/codeql-analysis.yml)
