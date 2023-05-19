@@ -11,11 +11,16 @@ MAX_RETRIES = 3
 RETRY_DELAY = 1  # Number of seconds to wait between retries
 
 def clear_screen():
-    # Clear screen
+    """Clears the console screen."""
     os.system("cls" if os.name == "nt" else "clear")
 
 
 def check_network_connection():
+    """Checks the network connection by pinging a server.
+
+    Returns:
+        bool: True if the network connection is available, False otherwise.
+    """
     conn = httplib.HTTPSConnection("8.8.8.8", timeout=5)
     try:
         conn.request("HEAD", "/")
@@ -27,6 +32,11 @@ def check_network_connection():
 
 
 def print_pnr_status(json_data):
+    """Prints the PNR status details extracted from the JSON data.
+
+    Args:
+        json_data (dict): JSON data containing PNR status details.
+    """
     train_number = json_data["TrainDetails"]["Train"]["Number"]
     train_name = json_data["TrainDetails"]["Train"]["Name"]
     chart_status = json_data["TrainDetails"]["ChartPrepared"]
@@ -50,6 +60,12 @@ def print_pnr_status(json_data):
 
 
 def install_required_libraries():
+    """Installs the required libraries if they are not found.
+
+    Returns:
+        bool: True if all required libraries are installed or already present,
+              False if any library installation fails.
+    """
     required_libraries = ["argparse", "requests", "fake_useragent"]
 
     missing_libraries = []
@@ -75,6 +91,14 @@ def install_required_libraries():
 
 
 def get_pnr_status(pnr):
+    """Retrieves the PNR status by making an API request.
+
+    Args:
+        pnr (str): PNR number.
+
+    Returns:
+        dict: JSON data containing the PNR status details.
+    """
     import requests
     from fake_useragent import UserAgent
 
@@ -110,11 +134,24 @@ def get_pnr_status(pnr):
 
 
 def validate_pnr(pnr):
+    """Validates the PNR number.
+
+    Args:
+        pnr (str): PNR number.
+
+    Raises:
+        ValueError: If the PNR number is not a 10-digit number.
+    """
     if len(pnr) != PNR_LENGTH or not pnr.isdigit():
         raise ValueError("PNR should be a 10-digit number.")
 
 
 def parse_arguments():
+    """Parses command-line arguments.
+
+    Returns:
+        argparse.Namespace: Parsed arguments.
+    """
     import argparse
 
     parser = argparse.ArgumentParser(description="Check PNR status.")
@@ -123,10 +160,16 @@ def parse_arguments():
 
 
 def setup_logging():
+    """Sets up the logging configuration."""
     logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
 
 
 def process_pnr_status(pnr):
+    """Processes the PNR status by performing necessary checks and retrieving the status.
+
+    Args:
+        pnr (str): PNR number.
+    """
     setup_logging()
 
     if not install_required_libraries():
