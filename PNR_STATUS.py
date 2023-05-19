@@ -1,10 +1,8 @@
 import os
 import time
-import requests
 import http.client as httplib
-from json import loads
-import argparse
 import logging
+from json import loads
 
 PNR_LENGTH = 10
 API_ENDPOINT = 'https://mapi.makemytrip.com/api/rails/pnr/currentstatus/v1'
@@ -50,22 +48,34 @@ def print_pnr_status(json_data):
 
 
 def install_required_libraries():
-    try:
-        import requests
-        from json import loads
-    except ImportError:
-        print("Required libraries not found. Trying to install them...")
-        os.system("pip install requests")
+    required_libraries = ["argparse", "requests", "fake_useragent"]
+
+    missing_libraries = []
+    for library in required_libraries:
         try:
-            import requests
-            from json import loads
+            __import__(library)
         except ImportError:
-            print("Failed to install required libraries. Please install 'requests' manually.")
-            return False
+            missing_libraries.append(library)
+
+    if missing_libraries:
+        print("Required libraries not found. Trying to install them...")
+        for library in missing_libraries:
+            os.system(f"pip install {library}")
+            try:
+                __import__(library)
+            except ImportError:
+                print(f"Failed to install {library}. Please install it manually.")
+                return False
+
+        clear_screen()  # Clear the screen after installing missing libraries
+
     return True
 
 
 def get_pnr_status(pnr):
+    import requests
+    from fake_useragent import UserAgent
+
     json_data = None
 
     json = {
@@ -77,7 +87,7 @@ def get_pnr_status(pnr):
     }
     headers = {
         'accept': 'application/json',
-        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36',
+        'user-agent': UserAgent().random,
     }
 
     try:
@@ -98,6 +108,8 @@ def validate_pnr(pnr):
 
 
 def parse_arguments():
+    import argparse
+
     parser = argparse.ArgumentParser(description="Check PNR status.")
     parser.add_argument("pnr", type=str, help="PNR number")
     return parser.parse_args()
@@ -107,12 +119,11 @@ def setup_logging():
     logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
 
 
-def main():
-    clear_screen()
+def process_pnr_status(pnr):
     setup_logging()
 
-    args = parse_arguments()
-    pnr = args.pnr
+    if not install_required_libraries():
+        return
 
     try:
         validate_pnr(pnr)
@@ -135,7 +146,8 @@ def main():
         return
 
     if "Error" in json_data:
-        logging.error(json_data["Error"]["message"])
+        error_message = json_data["Error"]["message"]
+        logging.error(error_message)
         logging.info("Total time taken: %s seconds", round(end_time - start_time, 3))
         return
 
@@ -144,4 +156,9 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    clear_screen()
+
+    args = parse_arguments()
+    pnr = args.pnr
+
+    process_pnr_status(pnr)
