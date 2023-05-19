@@ -35,26 +35,6 @@ Replace `<pnr>` with the actual PNR number you want to check.
 
 4. The script will retrieve the PNR status information and display it on the console.
 
-## Code Structure
-
-The code is organized into several functions to handle different aspects of the PNR status checking process. Here's an overview of the code structure:
-
-- Import Statements: The necessary libraries and modules are imported.
-
-- Constants: Two constants are defined: `PNR_LENGTH` and `API_ENDPOINT`.
-
-- Utility Functions: Functions for clearing the screen, checking network connection, printing PNR status, installing required libraries, getting PNR status, validating PNR, parsing command-line arguments, and setting up logging.
-
-- Main Function: The main entry point of the script that orchestrates the PNR status checking process.
-
-## Logging
-
-The script utilizes the logging module to provide informative messages and error handling. The log messages are displayed on the console with the log level prefix in square brackets, such as `[INFO]` or `[ERROR]`.
-
-## Error Handling
-
-The script performs error handling for various scenarios, such as invalid PNR, network connectivity issues, API request failures, and missing required libraries. Detailed error messages are displayed on the console for troubleshooting.
-
 **Note:**
 - Ensure you have an active internet connection to fetch the PNR status information.
 
