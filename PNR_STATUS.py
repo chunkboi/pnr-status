@@ -42,7 +42,7 @@ def install_required_libraries():
         bool: True if all required libraries are installed or already present,
               False if any library installation fails.
     """
-    required_libraries = ["requests"]
+    required_libraries = ["requests", "colorama"]
 
     missing_libraries = []
     for library in required_libraries:
@@ -72,6 +72,8 @@ def print_pnr_status(json_data):
     Args:
         json_data (dict): JSON data containing PNR status details.
     """
+    import colorama
+    from colorama import Fore, Style
     train_number = json_data["TrainDetails"]["Train"]["Number"]
     train_name = json_data["TrainDetails"]["Train"]["Name"]
     chart_status = json_data["TrainDetails"]["ChartPrepared"]
@@ -83,20 +85,20 @@ def print_pnr_status(json_data):
 
     separator = "-" * 70
 
-    print("PNR STATUS".center(70))
+    print(Fore.YELLOW + Style.BRIGHT + "PNR STATUS".center(70) + Style.RESET_ALL)
     print(separator)
     print(f"Train: {train_number} - {train_name}".center(70))
-    print(f"Route: {start_station} -> {destination_station}".center(70))
-    print(f"Date of Journey: {date_of_journey}".center(70))
-    print(f"Class: {class_name}".center(70))
-    print(f"Quota: {quota}".center(70))
-    print(f"Chart Prepared: {chart_status}".center(70))
+    print(Fore.CYAN + f"Route: {start_station} -> {destination_station}".center(70) + Style.RESET_ALL)
+    print(Fore.RED + f"Date of Journey: {date_of_journey}".center(70) + Style.RESET_ALL)
+    print(Fore.RED + f"Class: {class_name}".center(70) + Style.RESET_ALL)
+    print(Fore.RED + f"Quota: {quota}".center(70) + Style.RESET_ALL)
+    print(Fore.MAGENTA + f"Chart Prepared: {chart_status}".center(70) + Style.RESET_ALL)
     print(separator)
 
-    print("Passenger Details:".center(70))
+    print(Fore.YELLOW + Style.BRIGHT + "Passenger Details:".center(70) + Style.RESET_ALL)
     for passenger in json_data["PassengerDetails"]["PassengerStatus"]:
         passenger_info = f"Passenger {passenger['Number']}: {passenger['CurrentStatus']}"
-        print(passenger_info.center(70))
+        print(Fore.GREEN + passenger_info.center(70) + Style.RESET_ALL)
 
     print(separator)
 
