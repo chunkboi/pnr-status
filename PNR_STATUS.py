@@ -3,7 +3,7 @@ import time
 import logging
 import http.client as httplib
 from json import loads
-from requests.exceptions import RequestException
+import argparse
 
 
 PNR_LENGTH = 10
@@ -35,6 +35,37 @@ def check_network_connection():
             conn.close()
 
 
+def install_required_libraries():
+    """Installs the required libraries if they are not found.
+
+    Returns:
+        bool: True if all required libraries are installed or already present,
+              False if any library installation fails.
+    """
+    required_libraries = ["requests"]
+
+    missing_libraries = []
+    for library in required_libraries:
+        try:
+            __import__(library)
+        except ImportError:
+            missing_libraries.append(library)
+
+    if missing_libraries:
+        print("Required libraries not found. Trying to install them...")
+        for library in missing_libraries:
+            os.system(f"pip install {library}")
+            try:
+                __import__(library)
+            except ImportError:
+                print(f"Failed to install {library}. Please install it manually.")
+                return False
+
+        clear_screen()  # Clear the screen after installing missing libraries
+
+    return True
+
+
 def print_pnr_status(json_data):
     """Prints the PNR status details extracted from the JSON data.
 
@@ -50,54 +81,24 @@ def print_pnr_status(json_data):
     class_name = json_data["PnrDetails"]["Class"]
     quota = json_data["PnrDetails"]["Quota"]
 
-    print("PNR STATUS")
-    print("------------------------------------------------------------------")
-    print(f"{start_station} -> {destination_station}")
-    print(f"{train_number} - {train_name}\n")
-    print("Chart Prepared?:", chart_status)
-    print("Quota:", quota)
-    print("Class:", class_name)
-    print("Date Of Journey:", date_of_journey, "\n")
+    separator = "-" * 70
 
+    print("PNR STATUS".center(70))
+    print(separator)
+    print(f"Train: {train_number} - {train_name}".center(70))
+    print(f"Route: {start_station} -> {destination_station}".center(70))
+    print(f"Date of Journey: {date_of_journey}".center(70))
+    print(f"Class: {class_name}".center(70))
+    print(f"Quota: {quota}".center(70))
+    print(f"Chart Prepared: {chart_status}".center(70))
+    print(separator)
+
+    print("Passenger Details:".center(70))
     for passenger in json_data["PassengerDetails"]["PassengerStatus"]:
-        print(f"Passenger {passenger['Number']}: {passenger['CurrentStatus']}")
+        passenger_info = f"Passenger {passenger['Number']}: {passenger['CurrentStatus']}"
+        print(passenger_info.center(70))
 
-
-def install_required_libraries():
-    """Installs the required libraries if they are not found.
-
-    Returns:
-        bool: True if all required libraries are installed or already present,
-              False if any library installation fails.
-    """
-    required_libraries = ["argparse", "requests"]
-
-    missing_libraries = []
-    for library in required_libraries:
-        try:
-            __import__(library)
-        except ImportError:
-            missing_libraries.append(library)
-
-    if missing_libraries:
-        print("Required libraries not found. Trying to install them...")
-
-        import subprocess
-        for library in missing_libraries:
-            subprocess.check_call(['pip', 'install', library])
-
-        try:
-            import argparse
-            import requests
-            from fake_useragent import UserAgent
-        except ImportError as e:
-            logging.error(f"Failed to import required libraries: {str(e)}")
-            return False
-
-        clear_screen()  # Clear the screen after installing missing libraries
-
-    return True
-
+    print(separator)
 
 def get_pnr_status(pnr):
     """Retrieves the PNR status by making an API request.
@@ -109,6 +110,7 @@ def get_pnr_status(pnr):
         dict: JSON data containing the PNR status details.
     """
     import requests
+    from fake_useragent import UserAgent
 
     json_data = None
 
@@ -121,21 +123,22 @@ def get_pnr_status(pnr):
     }
     headers = {
         'accept': 'application/json',
-        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36',
+        'user-agent': UserAgent().random,
     }
-
     for _ in range(MAX_RETRIES):
         try:
             response = requests.post(API_ENDPOINT, headers=headers, json=json)
             response.raise_for_status()
             json_data = loads(response.content)
             break  # Break the loop if the request is successful
-        except RequestException as e:
+        except requests.exceptions.RequestException as e:
             logging.error(f"An error occurred while making the API request: {str(e)}")
             time.sleep(RETRY_DELAY)
+            exit(1)
         except Exception as e:
             logging.error(str(e))
             time.sleep(RETRY_DELAY)
+            exit(1)
 
     return json_data
 
@@ -159,8 +162,6 @@ def parse_arguments():
     Returns:
         argparse.Namespace: Parsed arguments.
     """
-    import argparse
-
     parser = argparse.ArgumentParser(description="Check PNR status.")
     parser.add_argument("pnr", type=str, help="PNR number")
     return parser.parse_args()
