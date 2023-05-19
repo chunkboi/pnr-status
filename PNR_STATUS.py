@@ -1,7 +1,13 @@
-import requests
 import os
 import time
+import requests
 import http.client as httplib
+from json import loads
+import argparse
+import logging
+
+PNR_LENGTH = 10
+API_ENDPOINT = 'https://mapi.makemytrip.com/api/rails/pnr/currentstatus/v1'
 
 
 def clear_screen():
@@ -38,7 +44,7 @@ def print_pnr_status(json_data):
     print("Quota:", quota)
     print("Class:", class_name)
     print("Date Of Journey:", date_of_journey, "\n")
-    
+
     for passenger in json_data["PassengerDetails"]["PassengerStatus"]:
         print(f"Passenger {passenger['Number']}: {passenger['CurrentStatus']}")
 
@@ -75,32 +81,47 @@ def get_pnr_status(pnr):
     }
 
     try:
-        response = requests.post('https://mapi.makemytrip.com/api/rails/pnr/currentstatus/v1', headers=headers,
-                                 json=json)
+        response = requests.post(API_ENDPOINT, headers=headers, json=json)
         response.raise_for_status()
         json_data = loads(response.content)
     except requests.exceptions.RequestException as e:
-        print("An error occurred while making the API request:", str(e))
+        logging.error("An error occurred while making the API request: %s", str(e))
     except ValueError:
-        print("Invalid JSON data received from the API.")
+        logging.error("Invalid JSON data received from the API.")
 
     return json_data
 
 
+def validate_pnr(pnr):
+    if len(pnr) != PNR_LENGTH or not pnr.isdigit():
+        raise ValueError("PNR should be a 10-digit number.")
+
+
+def parse_arguments():
+    parser = argparse.ArgumentParser(description="Check PNR status.")
+    parser.add_argument("pnr", type=str, help="PNR number")
+    return parser.parse_args()
+
+
+def setup_logging():
+    logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
+
+
 def main():
     clear_screen()
+    setup_logging()
 
-    if not install_required_libraries():
-        return
+    args = parse_arguments()
+    pnr = args.pnr
 
-    pnr = input("Enter PNR number: ")
-
-    if len(pnr) != 10 or not pnr.isdigit():
-        print("PNR should be a 10-digit number.")
+    try:
+        validate_pnr(pnr)
+    except ValueError as e:
+        logging.error(str(e))
         return
 
     if not check_network_connection():
-        print("Please connect to a network to check PNR status.")
+        logging.error("Please connect to a network to check PNR status.")
         return
 
     start_time = time.perf_counter()
@@ -110,16 +131,16 @@ def main():
     end_time = time.perf_counter()
 
     if json_data is None:
-        print("Failed to retrieve PNR status.")
+        logging.error("Failed to retrieve PNR status.")
         return
 
     if "Error" in json_data:
-        print(json_data["Error"]["message"])
-        print(f"Total time taken: {round(end_time - start_time, 3)} seconds")
+        logging.error(json_data["Error"]["message"])
+        logging.info("Total time taken: %s seconds", round(end_time - start_time, 3))
         return
 
     print_pnr_status(json_data)
-    print(f"Total time taken: {round(end_time - start_time, 3)} seconds")
+    logging.info("Total time taken: %s seconds", round(end_time - start_time, 3))
 
 
 if __name__ == "__main__":
