@@ -1,5 +1,3 @@
-#Certainly! Here's the documentation for the script in raw Markdown:
-
 # PNR Status Checker
 
 The PNR Status Checker is a Python script that allows users to check the status of their PNR (Passenger Name Record) for Indian Railways. It retrieves real-time information about the train, chart preparation, and passenger details.
