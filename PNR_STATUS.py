@@ -19,7 +19,6 @@ from requests import post
 from json import loads
 import time
 import sys
-import os
 
 def clear_screen():
     # Clear screen
