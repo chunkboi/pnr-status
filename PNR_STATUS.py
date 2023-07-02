@@ -111,7 +111,7 @@ def main():
         print("An error occurred while connecting to the API:", str(e))
         sys.exit(1)
     except ValueError as e:
-        print("Invalid response from the API. Response cannot be parsed as JSON.")
+        print("Invalid response from the API. Response cannot be parsed as JSON.", str(e))
         sys.exit(1)
     except Exception as e:
         print("An error occurred:", str(e))
