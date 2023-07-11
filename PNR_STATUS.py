@@ -14,7 +14,7 @@ RETRY_DELAY = 1  # Number of seconds to wait between retries
 
 def clear_screen():
     """Clears the console screen."""
-    print("\033[2J")
+    print("\\033[H\033[2J")
 
 
 def check_network_connection():
