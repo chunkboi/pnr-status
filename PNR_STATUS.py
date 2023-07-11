@@ -22,7 +22,7 @@ import sys
 
 def clear_screen():
     # Clear screen
-    print("\033[2J")
+    print("\033[H\033[2J")
     
 def encrypt_pnr(pnr):
     """Encrypts the PNR number using AES CBC encryption with PKCS7 padding.
