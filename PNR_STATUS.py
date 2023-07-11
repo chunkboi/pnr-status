@@ -1,9 +1,9 @@
-import os
 import time
 import logging
 import http.client as httplib
 from json import loads
 import argparse
+import subprocess
 
 
 PNR_LENGTH = 10
@@ -54,7 +54,7 @@ def install_required_libraries():
     if missing_libraries:
         print("Required libraries not found. Trying to install them...")
         for library in missing_libraries:
-            os.system(f"pip install {library}")
+            subprocess.check_call(['pip', 'install', library])
             try:
                 __import__(library)
             except ImportError:
