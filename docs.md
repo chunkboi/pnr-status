@@ -24,7 +24,7 @@ The PNR Status Checker script performs the following tasks:
 
 ### 1. `clear_screen()`
 
-This function clears the console screen. It uses the `os` module and calls the appropriate system command based on the operating system.
+This function clears the console screen.
 
 ### 2. `check_network_connection()`
 
