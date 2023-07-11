@@ -16,10 +16,10 @@ To run this script, you need to have the following:
 
 ## How to Use
 
-1. Clone the repository or download the script file (`pnr_status_checker.py`).
+1. Clone the repository or download the script file (`PNR_STATUS.py`).
 2. Open a terminal or command prompt.
 3. Navigate to the directory where the script is located.
-4. Run the script using the command: `python pnr_status_checker.py`.
+4. Run the script using the command: `python PNR_STATUS.py`.
 5. Follow the prompts to enter the 10-digit PNR number when prompted.
 
 ## Automatic Package Installation
