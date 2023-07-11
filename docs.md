@@ -36,7 +36,7 @@ This function takes the JSON data representing the PNR status and prints the rel
 
 ### 4. `install_required_libraries()`
 
-This function checks if the required libraries (`argparse`, `requests`, and `fake_useragent`) are installed. If any library is missing, it attempts to install them using the `os` module and the `pip` command. It returns `True` if all required libraries are installed or successfully installed, otherwise `False`.
+This function checks if the required libraries (`argparse`, `requests`, and `fake_useragent`) are installed. If any library is missing, it attempts to install them using the `subprocess` module and the `pip` command. It returns `True` if all required libraries are installed or successfully installed, otherwise `False`.
 
 ### 5. `get_pnr_status(pnr)`
 
@@ -60,9 +60,7 @@ This function is the main entry point of the script. It sets up the logging, ins
 
 ### 10. `__name__ == "__main__"`
 
-This condition is used to ensure that the script is run directly and not imported as a
-
- module. It clears the screen, installs the required libraries if necessary, parses the command-line arguments, and calls the `process_pnr_status()` function with the provided PNR number.
+This condition is used to ensure that the script is run directly and not imported as a module. It clears the screen, installs the required libraries if necessary, parses the command-line arguments, and calls the `process_pnr_status()` function with the provided PNR number.
 
 ## Usage
 
