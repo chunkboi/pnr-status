@@ -1,4 +1,4 @@
-# PNR Status Checker
+# PNR Status Checker (DEPRECATED, NO LONGER MAINTAINED)
 
 This script allows you to check the status of a Passenger Name Record (PNR) for Indian Railways. It performs the following tasks:
 
